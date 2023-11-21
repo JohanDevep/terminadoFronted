@@ -1,0 +1,8 @@
+.rotate-on-hover {
+    transition: transform 1.5s ease; 
+  }
+  
+  .card-back:hover .rotate-on-hover {
+    transform: rotateY(360deg); 
+  }
+  
