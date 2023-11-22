@@ -22,7 +22,7 @@ export const useLoginMutation = () => {
       );
       return response.data.accessToken;
     } catch (error) {
-      return Promise.reject(error.response.data);
+      return (error.response.data);
     }
   });
 };
