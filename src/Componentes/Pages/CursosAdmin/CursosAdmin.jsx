@@ -7,30 +7,41 @@ import Modal from "react-modal";
 Modal.setAppElement("#root"); // Necesario para el funcionamiento de react-modal
 
 export const CursosAdmin = () => {
-  const [cursos, setCursos] = useState([]);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [cursoIdToDelete, setCursoIdToDelete] = useState(null);
+  // Variables de estado
+  const [cursos, setCursos] = useState([]); // Estado para almacenar la lista de cursos
+  const [modalIsOpen, setModalIsOpen] = useState(false); // Estado para gestionar la visibilidad del modal
+  const [cursoIdToDelete, setCursoIdToDelete] = useState(null); // Estado para almacenar el ID del curso a eliminar
 
+  // Función para obtener cursos desde la API
   const getCursos = async () => {
-    const response = await axios.get("http://localhost:8080/api/auth/cursos");
-    setCursos(response.data);
+    try {
+      const response = await axios.get("http://localhost:8080/api/auth/cursos");
+      setCursos(response.data);
+    } catch (error) {
+      console.error("Error al obtener la lista de cursos", error);
+    }
   };
 
+  // useEffect para obtener cursos cuando el componente se monta
   useEffect(() => {
     getCursos();
   }, []);
 
+  // Función para confirmar la eliminación de un curso
   function confirmarEliminarCurso(id) {
     setCursoIdToDelete(id);
     setModalIsOpen(true);
   }
 
+  // Función para eliminar el curso seleccionado
   function eliminarCurso() {
     axios
       .delete(`http://localhost:8080/api/auth/cursos/${cursoIdToDelete}`)
       .then((response) => {
+        // Actualizar la lista de cursos después de la eliminación exitosa
         getCursos();
-        setModalIsOpen(false); 
+        // Cerrar el modal después de la eliminación
+        setModalIsOpen(false);
       })
       .catch((error) => {
         console.error("Error al eliminar el curso", error);

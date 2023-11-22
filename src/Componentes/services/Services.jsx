@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "react-query";
 import axios from "axios";
-//useContactoMutation
+
+// Funcion de mutación para enviar mensajes de contacto
 export const useContactoMutation = () => {
   return useMutation(async (data) => {
     const response = await axios.post(
@@ -11,6 +12,7 @@ export const useContactoMutation = () => {
   });
 };
 
+// Funcion de mutación para iniciar sesión
 export const useLoginMutation = () => {
   return useMutation(async (data) => {
     try {
@@ -24,7 +26,8 @@ export const useLoginMutation = () => {
     }
   });
 };
-//
+
+// Funcion de mutación para registrar un nuevo usuario
 export const useRegisterMutation = () => {
   const queryClient = useQueryClient();
 
@@ -37,17 +40,18 @@ export const useRegisterMutation = () => {
         );
         return response.data;
       } catch (error) {
-        return Promise.reject(error.response.data); // Throw the error response data
+        return Promise.reject(error.response.data);
       }
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("userList"); // Invalidate the user list cache if necessary
+        queryClient.invalidateQueries("userList");
       },
     }
   );
 };
 
+// Funcion de mutación para registrar un nuevo instructor
 export const useRegisterINSMutation = () => {
   const queryClient = useQueryClient();
 
@@ -60,17 +64,18 @@ export const useRegisterINSMutation = () => {
         );
         return response.data;
       } catch (error) {
-        throw new Error(error.response.data); 
+        throw new Error(error.response.data);
       }
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("userList"); 
+        queryClient.invalidateQueries("userList");
       },
     }
   );
 };
 
+// Funcion de mutación para crear un nuevo curso
 export const useCursoMutation = () => {
   return useMutation(async (cursoData) => {
     const response = await axios.post(
@@ -81,16 +86,17 @@ export const useCursoMutation = () => {
   });
 };
 
+// Funcion de mutación para crear un nuevo instructor
 export const useInstructoresMutation = () => {
   return useMutation(async (instructoresData) => {
     try {
       const response = await axios.post(
-        'http://localhost:8080/api/auth/CrearInstructor',
+        "http://localhost:8080/api/auth/CrearInstructor",
         instructoresData
       );
       return response.data;
     } catch (error) {
-      console.error('Error en la solicitud:', error.response.data);
+      console.error("Error en la solicitud:", error.response.data);
       return Promise.reject(error.response.data);
     }
   });

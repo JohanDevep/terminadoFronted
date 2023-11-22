@@ -7,30 +7,55 @@ import Modal from "react-modal";
 Modal.setAppElement("#root"); // Necesario para el funcionamiento de react-modal
 
 export const CursosINS = () => {
+  // Estado para almacenar la lista de cursos
   const [cursos, setCursos] = useState([]);
+
+  // Obtener el parámetro de nombre de la URL
   const nombre = useParams();
+
+  // Estado para gestionar la visibilidad del modal
   const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  // Estado para almacenar el ID del curso a eliminar
   const [cursoIdToDelete, setCursoIdToDelete] = useState(null);
 
+  // Función para obtener la lista de cursos desde el servidor
   const getCursos = async () => {
-    const response = await axios.get("http://localhost:8080/api/auth/cursos");
-    setCursos(response.data);
+    try {
+      // Realizar una solicitud GET al servidor para obtener la lista de cursos
+      const response = await axios.get("http://localhost:8080/api/auth/cursos");
+
+      // Establecer el estado de cursos con los datos obtenidos de la respuesta
+      setCursos(response.data);
+    } catch (error) {
+      // Manejar errores en caso de que la solicitud no sea exitosa
+      console.error("Error al obtener la lista de cursos", error);
+      // Puedes agregar lógica adicional para manejar el error según tus necesidades
+    }
   };
 
+  // useEffect para obtener cursos cuando el componente se monta
   useEffect(() => {
     getCursos();
   }, []);
 
+  // Función para confirmar la eliminación de un curso
   function confirmarEliminarCurso(id) {
+    // Establecer el ID del curso a eliminar en el estado
     setCursoIdToDelete(id);
+
+    // Abrir el modal de confirmación
     setModalIsOpen(true);
   }
 
+  // Función para eliminar el curso seleccionado
   function eliminarCurso() {
     axios
       .delete(`http://localhost:8080/api/auth/cursos/${cursoIdToDelete}`)
       .then((response) => {
+        // Actualizar la lista de cursos después de la eliminacion exitosa
         getCursos();
+        // Cerrar el modal después de la eliminacion
         setModalIsOpen(false);
       })
       .catch((error) => {
@@ -38,6 +63,7 @@ export const CursosINS = () => {
       });
   }
 
+  // Filtrar cursos por el nombre obtenido de los parametros de la URL
   const filtro = cursos.filter((curso) => curso.correo === nombre.nombre);
 
   return (

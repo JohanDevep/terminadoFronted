@@ -33,8 +33,6 @@ function Registro() {
   const { nombre, apellido, telefono, correo, password, confirmarPassword } =
     user;
 
-  
-
   const { mutate, isLoading } = useRegisterMutation();
 
   const onInputChange = (e) => {
@@ -43,6 +41,7 @@ function Registro() {
 
   const displayRegistrationNotification = () => {
     toast.success("Registro Exitoso");
+    // Redirige a la página de inicio de sesión después del tiempo de espera
     setTimeout(() => {
       navigate("/login");
     }, 3500);
@@ -51,6 +50,7 @@ function Registro() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validación de campos vacíos
     if (
       !nombre ||
       !apellido ||
@@ -64,6 +64,7 @@ function Registro() {
       return;
     }
 
+    // Validación de contraseñas coincidentes
     if (password !== confirmarPassword) {
       setError(true);
       setErrorMessage("Las contraseñas no coinciden");
@@ -71,22 +72,26 @@ function Registro() {
     }
 
     try {
+      // Realiza la mutación para registrar al usuario
       await mutate(user, {
         onSuccess: () => {
+          // Resetea los campos del usuario y muestra la notificación de registro exitoso
           resetUser();
           setError(false);
           setErrorMessage("");
           displayRegistrationNotification();
         },
         onError: (error) => {
+          // Maneja los errores de registro
           if (error && error.response) {
-            setErrorMessage(error.response);
+            setErrorMessage(error.response.data); // Modifica el mensaje de error según la respuesta del servidor
             setError(true);
           }
         },
       });
     } catch (error) {
-    
+      // Maneja otros errores
+      console.error("Error during registration:", error);
     }
   };
 

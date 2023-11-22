@@ -2,11 +2,18 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 function InstructorCard({ instructor, onUpdateStatus, onDeleteInstructor }) {
+  // Estado para el botón de estado (Habilitado/Deshabilitado)
   const [isButtonActive, setButtonActive] = useState(
     instructor.estado === "Habilitado"
   );
+
+  // Estado para el estado original antes de la edición
   const [originalStatus, setOriginalStatus] = useState(instructor.estado);
+
+  // Estado para indicar si se está editando la tarjeta del instructor
   const [isEditing, setEditing] = useState(false);
+
+  // Estados para los campos editados
   const [editedDescription, setEditedDescription] = useState(
     instructor.description
   );
@@ -14,31 +21,52 @@ function InstructorCard({ instructor, onUpdateStatus, onDeleteInstructor }) {
   const [editedName, setEditedName] = useState(instructor.nombre);
   const [editedTitle, setEditedTitle] = useState(instructor.titulos);
 
+  // Función para manejar el cambio de imagen
   const handleImageChange = (e) => {
+    // Obtener el archivo de la entrada de archivos
     const file = e.target.files[0];
+
+    // Verificar si se seleccionó un archivo
     if (file) {
+      // Llamar a la función para convertir la imagen a formato base64
       convertImageToBase64(file);
     }
   };
 
+  // Función para convertir la imagen a Base64
   const convertImageToBase64 = (file) => {
+    // Crear una instancia de FileReader
     const reader = new FileReader();
+
+    // Configurar el evento que se ejecutará al cargar completamente el archivo
     reader.onloadend = () => {
+      // Cuando la lectura está completa, establecer el resultado (formato base64) en el estado
       setEditedImage(reader.result);
     };
+
+    // Iniciar la lectura del archivo como una URL de datos (formato base64)
     reader.readAsDataURL(file);
   };
 
+  // Función para manejar el clic en el botón de estado (Habilitado/Deshabilitado)
   const handleButtonClick = () => {
+    // Verificar si el componente está en modo de edición
     if (isEditing) {
+      // Determinar el nuevo estado opuesto al estado actual
       const newStatus = isButtonActive ? "Deshabilitado" : "Habilitado";
+
+      // Actualizar el estado del botón (activado/desactivado)
       setButtonActive(!isButtonActive);
+
+      // Llamar a la función onUpdateStatus con el ID del instructor y el nuevo estado
       onUpdateStatus(instructor.idInstructores, newStatus);
     }
   };
 
+  // Función para manejar el clic en el botón de guardar
   async function handleSaveClick() {
     try {
+      // Realizar una solicitud PUT para actualizar la información del instructor
       const response = await axios.put(
         `http://localhost:8080/api/auth/instructores/editar/${instructor.idInstructores}`,
         {
@@ -49,45 +77,67 @@ function InstructorCard({ instructor, onUpdateStatus, onDeleteInstructor }) {
           titulos: editedTitle,
         }
       );
+
+      // Verificar si la solicitud fue exitosa (código de estado 200)
       if (response.status === 200) {
+        // Actualizar el estado original con el estado actual del botón
         setOriginalStatus(isButtonActive ? "Habilitado" : "Deshabilitado");
+
+        // Salir del modo de edición
         setEditing(false);
       }
     } catch (error) {
+      // Capturar errores y registrar en la consola
       console.error("Error en la solicitud:", error);
-      // Manejar errores si es necesario
+
+      // Puedes agregar lógica adicional para manejar errores, mostrar mensajes, etc.
     }
   }
 
+  // Estado para mostrar/ocultar el modal de confirmación al eliminar
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
+  // Función para manejar el clic en el botón de eliminar
   const handleDeleteClick = () => {
     setShowConfirmationModal(true);
   };
 
-  const handleConfirmDelete = async () => {
-    setShowConfirmationModal(false);
-    try {
-      const response = await axios.delete(
-        `http://localhost:8080/api/auth/instructores/eliminar/${instructor.idInstructores}`
-      );
-      if (response.status === 200) {
-        onDeleteInstructor(instructor.idInstructores);
-      }
-    } catch (error) {
-      console.error("Error al intentar eliminar el instructor:", error);
-      // Manejar errores si es necesario
-    }
-  };
+  // Función para confirmar la eliminación
+const handleConfirmDelete = async () => {
+  // Ocultar el modal de confirmación
+  setShowConfirmationModal(false);
 
+  try {
+    // Realizar una solicitud DELETE para eliminar al instructor
+    const response = await axios.delete(
+      `http://localhost:8080/api/auth/instructores/eliminar/${instructor.idInstructores}`
+    );
+
+    // Verificar si la solicitud fue exitosa (código de estado 200)
+    if (response.status === 200) {
+      // Llamar a la función onDeleteInstructor con el ID del instructor eliminado
+      onDeleteInstructor(instructor.idInstructores);
+    }
+  } catch (error) {
+    // Capturar errores y registrar en la consola
+    console.error("Error al intentar eliminar el instructor:", error);
+
+    // Puedes agregar lógica adicional para manejar errores, mostrar mensajes, etc.
+  }
+};
+
+
+  // Función para cancelar la eliminación
   const handleCancelDelete = () => {
     setShowConfirmationModal(false);
   };
 
+  // Función para manejar el clic en el botón de editar
   const handleEditClick = () => {
     setEditing(true);
   };
 
+  // Función para cancelar la edición
   const handleCancelClick = () => {
     // Restaurar los valores originales y salir del modo de edición
     setButtonActive(originalStatus === "Habilitado");
@@ -97,6 +147,7 @@ function InstructorCard({ instructor, onUpdateStatus, onDeleteInstructor }) {
     setEditedTitle(instructor.titulos);
     setEditing(false);
   };
+
   return (
     <div className="max-w-[calc(100%/4)] mb-8">
       <div className="xl:w-96 md:max-w-sm w-full rounded-lg overflow-hidden shadow-lg p-4 md:p-5 border-2 border-gray-200">

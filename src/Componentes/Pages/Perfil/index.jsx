@@ -3,12 +3,19 @@ import EditProfileModal from "./EditProfile";
 import axios from "axios";
 
 function index() {
+  // Estado para almacenar el perfil
   const [perfil, setPerfil] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [token, setToken] = useState(null); // Agrega el estado para el token
 
+  // Estado para indicar si se está editando el perfil
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Estado para almacenar el token
+  const [token, setToken] = useState(null);
+
+  // Función para manejar la edición del perfil
   const handleEditProfile = async (editedPerfil) => {
     try {
+      // Realizar una solicitud PUT para editar el perfil
       const response = await axios.put(
         "http://localhost:8080/api/auth/perfil/editar",
         editedPerfil,
@@ -19,43 +26,61 @@ function index() {
           },
         }
       );
+
+      // Verificar si la respuesta tiene datos y no contiene un error
       if (response.data && response.data.error) {
         return;
       }
-    
+
+      // Actualizar el estado del perfil con los datos de la respuesta
       setPerfil(response.data);
-      setIsEditing(false); 
+      // Desactivar la edición del perfil
+      setIsEditing(false);
     } catch (error) {
-      setError("Hubo un error al intentar editar el perfil. Por favor, inténtalo de nuevo.");
+      setError(
+        "Hubo un error al intentar editar el perfil. Por favor, inténtalo de nuevo."
+      );
     }
   };
 
+  // Efecto para cargar el perfil al cargar el componente
   useEffect(() => {
+    // Obtener el token almacenado en el local storage
     const storedToken = localStorage.getItem("token");
 
+    // Si hay un token almacenado, configurar el estado del token y obtener el perfil
     if (storedToken) {
       setToken(storedToken);
+
+      // Configurar las cabeceras con el token
       const headers = {
         Authorization: `Bearer ${storedToken}`,
       };
+
+      // Realizar una solicitud GET para obtener el perfil
       axios
         .get("http://localhost:8080/api/auth/perfil", { headers })
         .then((response) => {
+          // Actualizar el estado del perfil con los datos de la respuesta
           setPerfil(response.data);
         })
         .catch((error) => {
+          // En caso de error, establecer el perfil como nulo
           setPerfil(null);
         });
     }
   }, []);
 
+  // Función para manejar el clic en el botón de editar
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
+  // Función para manejar el cierre del modal de edición
   const handleCloseEditModal = () => {
     setIsEditing(false);
   };
+
   return (
     <div className="py-6">
       <div className="max-w-md mx-auto bg-white border border-zinc-300 shadow-md rounded-3xl">

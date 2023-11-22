@@ -6,15 +6,21 @@ import { Link, useParams } from "react-router-dom";
 export function set() {
   const [curso, setCurso] = useState([]);
   const { titulo } = useParams();
-  const getCurso = async () => {
-    const response = await axios.get("http://localhost:8080/api/auth/cursos");
-    setCurso(response.data);
-  };
 
+  const getCurso = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/auth/cursos");
+      setCurso(response.data);
+    } catch (error) {
+      // Manejar errores en la obtención de datos
+      console.error("Error al obtener datos del curso:", error);
+    }
+  };
   useEffect(() => {
     getCurso();
   }, []);
 
+  // Filtrar el curso por el título
   const filtro = curso.filter((cursos) => cursos.titulo === titulo);
 
   const video = filtro.map((filtro) =>

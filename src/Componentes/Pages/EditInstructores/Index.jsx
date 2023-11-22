@@ -43,22 +43,33 @@ function Index() {
     }, 1250); // Redirige a /login después de 3 segundos
   };
 
+  // Función para manejar la presentación del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validar la presencia de títulos y descripción
     if (!titulos || !description) {
       setError(true);
       return;
     }
+
+    // Asignar la imagen codificada a la propiedad 'images' de Instructores
     Instructores.images = encodedImage;
+
     try {
+      // Enviar la solicitud de mutación
       await mutate(Instructores, {
         onSuccess: () => {
+          // Resetear los valores de Instructores
           resetInstructores();
+          // Limpiar el estado de error
           setError(false);
+          // Mostrar la notificación de registro exitoso
           displayRegistrationNotification();
         },
         onError: (error) => {
           console.error("Error en la solicitud:", error);
+          // Mostrar mensaje de error en caso de falla en la mutación
           toast.error("Error al crear el instructor. Inténtalo de nuevo.");
         },
       });
@@ -67,17 +78,27 @@ function Index() {
     }
   };
 
+  // Estado para almacenar la imagen codificada
   const [encodedImage, setEncodedImage] = useState("");
 
+  // Función para manejar el cambio de archivo
   const handleFileChange = (event) => {
+    // Obtener el archivo seleccionado
     const file = event.target.files[0];
 
+    // Crear un lector de archivos
     const reader = new FileReader();
+
+    // Configurar la función que se ejecutará cuando se complete la lectura del archivo
     reader.onload = (event) => {
+      // Obtener la representación codificada de la imagen
       const encodedData = event.target.result;
+
+      // Establecer la imagen codificada en el estado
       setEncodedImage(encodedData);
     };
 
+    // Leer el contenido del archivo como una URL de datos
     reader.readAsDataURL(file);
   };
 

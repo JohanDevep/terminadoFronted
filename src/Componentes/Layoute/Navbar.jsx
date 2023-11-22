@@ -4,16 +4,17 @@ import logonav from "../images/logo-nav/logo.png";
 import axios from "axios";
 
 function Navbar() {
-  //son estados para almacenar y gestionar el estado
-  const [user, setuser] = useState([]);
-  const [userINS, setuserINS] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  // Estados para almacenar y gestionar el estado
+  const [user, setuser] = useState([]); // Para usuarios
+  const [userINS, setuserINS] = useState([]); // Para instructores
+  const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el menú de navegación está abierto o cerrado
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false); // Estado para controlar si el menú desplegable del usuario está visible o no
 
-  //Esta función se utiliza para mostrar u ocultar el menú desplegable cuando se hace clic en algún elemento que activa este comportamiento.
+  // Función para mostrar u ocultar el menú desplegable del usuario
   const toggleDropdown = () => {
     setIsDropdownVisible(!isDropdownVisible);
   };
+
   // Recuperar la cadena JSON del localStorage
   const token = window.localStorage.getItem("token");
   // Recuperar la cadena JSON del localStorage
@@ -21,13 +22,11 @@ function Navbar() {
   // Analizar la cadena JSON de nuevo a un objeto JavaScript
   const usuario = JSON.parse(usuarioJSON);
 
-  //useNavigate() para obtener la función de navegación y se almacena en la variable
-  //navigate para cambiar la ruta de la aplicación programáticamente.
+  // useNavigate() para obtener la función de navegación y se almacena en la variable navigate para cambiar la ruta de la aplicación programáticamente.
   const navigate = useNavigate();
-  //: Esto declara una función llamada LimpiarToken utilizando una expresión
-  //de función flecha (() => {...}). Esta función se define sin parámetros.
+
+  // Función para limpiar el token y redirigir al usuario a la página de inicio.
   const LimpiarToken = () => {
-    //para eliminar el elemento de almacenamiento llamado "token" del localStorage del navegador.
     window.localStorage.removeItem("token");
     window.localStorage.removeItem("nombre");
     navigate("/");
@@ -41,12 +40,15 @@ function Navbar() {
     // Actualiza el estado 'user' con los datos obtenidos del servidor.
     setuser(response.data);
   };
+
+  // Función asincrónica para obtener datos de instructores desde el servidor.
   const getUserINS = async () => {
     const response = await axios.get(
       "http://localhost:8080/api/auth/Instructores"
     );
     setuserINS(response.data);
   };
+
   // Efecto que se ejecuta después del montaje del componente para obtener datos de usuario.
   useEffect(() => {
     getUser();
@@ -58,6 +60,8 @@ function Navbar() {
 
   // Obtiene el nombre del rol del usuario filtrado.
   const rol = usuarioOnline.map((useR) => useR.roles[0].nombre);
+
+  // Filtra el usuario actual basado en su correo para instructores.
   const usuarioOnlineINS = user.filter((useR) => useR.correo === usuario);
 
   return (
@@ -67,6 +71,7 @@ function Navbar() {
           <img src={logonav} className="h-16 sm:h-16 md:h-16 lg:h-20 xl:h-24" />
         </a>
         <div className="block lg:hidden ">
+          {/* Botón para abrir/cerrar el menú en dispositivos móviles */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="flex items-center px-3 py-2 rounded text-black-500 hover:text-black-400 bg-gray-200 hover:bg-gray-300"
@@ -93,6 +98,7 @@ function Navbar() {
           }`}
         >
           <ul className="flex flex-col md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white  p-5 justify-center items-center">
+            {/* Enlaces de navegación */}
             <li className="py-2 lg:py-0 text-lg text-center items-center gap-x-5 pt-4 md:gap-x-4 lg:text-lg lg:flex  lg:pt-0">
               <a
                 href="/"
@@ -122,9 +128,10 @@ function Navbar() {
                 href="/contactos"
                 className="md:bg-transparent md:text-[#9A1B76] text-[#9A1B76] hover:text-[#db43b0] md:p-0 md:hover:text-[#db43b0]"
               >
-                Contactenos
+                Contáctenos
               </a>
             </li>
+            {/* Botones de inicio de sesión y registro */}
             <li className="py-2 lg:py-0 text-center">
               <button
                 style={{ display: `${token ? "none" : "block"} ` }}
@@ -132,7 +139,7 @@ function Navbar() {
                 type="button"
                 className="text-white bg-[#9A1B76] hover:bg-[#db43b0] py-1.5 px-5 text-lg font-semibold rounded-full"
               >
-                Iniciar Sesion
+                Iniciar Sesión
               </button>
             </li>
             <li className="py-2 lg:py-0 text-center">
@@ -145,15 +152,17 @@ function Navbar() {
                 Registrarme
               </button>
             </li>
+            {/* Menú desplegable del usuario */}
             <div
               className="relative group "
               style={{ display: `${token ? "block" : "none"} ` }}
             >
+              {/* Botón que muestra el nombre del usuario y la imagen de perfil */}
               <div
                 className="flex items-center cursor-pointer text-xl md:text-2xl lg:text-2xl text-blue border border-white border-b-0 group-hover:border-grey-light rounded-t-lg py-1 px-4"
                 onClick={toggleDropdown}
               >
-                {rol[0] != "INS"
+                {rol[0] !== "INS"
                   ? usuarioOnline.map((Rol) => (
                       <img
                         src={Rol.imagen}
@@ -179,6 +188,7 @@ function Navbar() {
                   <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                 </svg>
               </div>
+              {/* Contenido del menú desplegable del usuario */}
               <div
                 className={`items-center absolute border border-t-0 rounded-b-lg p-1 bg-white ${
                   isDropdownVisible ? "visible" : "invisible"
@@ -187,6 +197,7 @@ function Navbar() {
                   zIndex: 1000, // Asegúrate de que este valor sea suficientemente alto
                 }}
               >
+                {/* Información del usuario */}
                 <div className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                   <div>
                     {usuarioOnline.map((correo) => (
@@ -196,6 +207,7 @@ function Navbar() {
                     ))}
                   </div>
                 </div>
+                {/* Enlaces del menú desplegable */}
                 <hr className="border-t mx-2 border-grey-light" />
                 <a
                   href="/perfil"

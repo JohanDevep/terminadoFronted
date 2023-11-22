@@ -11,22 +11,30 @@ function IniciarSesion() {
   const [error, setError] = useState(false);
   const navigate = useNavigate();
 
-  //toast tipo alerta
+  // Toast para mostrar mensajes de error
   const displayLoginError = (err) => {
     toast.error(err);
   };
+
+  // Obtiene el token del localStorage
   const token = window.localStorage.getItem("token");
-  //guardo el nombre en el localstorage para en el navbar cuando lo llame pueda traer el nombre de la persona logueada
+
+  // Guarda el nombre en el localStorage para que pueda ser recuperado en el Navbar
   const nombreUsuario = JSON.stringify(correo);
   localStorage.setItem("nombre", nombreUsuario);
 
+  // Utiliza la función de mutación para realizar la autenticación
   const loginMutation = useLoginMutation();
 
+  // Maneja el envío del formulario de inicio de sesión
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      // Realiza la mutación para obtener el token de acceso
       const accessToken = await loginMutation.mutateAsync({ correo, password });
+
+      // Si se obtiene el token, lo guarda en el localStorage y redirige al usuario
       if (accessToken) {
         window.localStorage.setItem("token", accessToken);
         setCorreo("");

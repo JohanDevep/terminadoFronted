@@ -14,7 +14,7 @@ function EditCursoModal({ curso, isOpen, onClose, onSave }) {
 
   
   const handleSaveClick = () => {
-    onSave(editedCurso); // Llama a la función onSave con el curso editado
+    onSave(editedCurso); // Llama a la funcion onSave con el curso editado
     onClose(); // Cierra el modal
     window.location.reload();
   };

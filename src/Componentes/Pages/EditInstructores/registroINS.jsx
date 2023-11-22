@@ -6,8 +6,13 @@ import { useRegisterINSMutation } from "../../services/Services";
 import { Link, useNavigate } from "react-router-dom";
 
 function RegistroINS() {
+  // Estado para manejar errores
   const [error, setError] = useState(false);
+
+  // Estado para almacenar mensajes de error
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Estado para almacenar información del usuario
   const [user, setUser] = useState({
     nombre: "",
     apellido: "",
@@ -17,6 +22,7 @@ function RegistroINS() {
     confirmarPassword: "",
   });
 
+  // Función para resetear los valores del usuario
   const resetUser = () => {
     setUser({
       nombre: "",
@@ -28,16 +34,19 @@ function RegistroINS() {
     });
   };
 
+  // Hook de React Router para navegar entre páginas
   const navigate = useNavigate();
 
+  // Destructurar propiedades del objeto user
   const { nombre, apellido, telefono, correo, password, confirmarPassword } =
     user;
 
+  // Función para manejar errores durante el registro
   const handleRegistrationError = (error) => {
-
     if (error.response && error.response.data) {
       const errorMessage = error.response.data;
 
+      // Manejar errores específicos del servidor
       if (errorMessage.includes("usuario")) {
         setErrorMessage(
           "Ya existe un usuario con el nombre proporcionado. Intenta con otro nombre de usuario."
@@ -52,19 +61,23 @@ function RegistroINS() {
 
       setError(true);
     } else {
+      // Manejar errores genéricos
       setErrorMessage("Error inesperado. Inténtalo de nuevo.");
       setError(true);
     }
   };
 
+  // Mutation hook para realizar el registro
   const { mutate, isLoading } = useRegisterINSMutation({
     onError: handleRegistrationError,
   });
 
+  // Función para manejar cambios en los inputs
   const onInputChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
+  // Función para mostrar notificación de registro exitoso
   const displayRegistrationNotification = () => {
     toast.success("Guardado.. siguiente");
     setTimeout(() => {
@@ -72,9 +85,12 @@ function RegistroINS() {
     }, 3500);
   };
 
+  // Función para manejar el envío del formulario de registro
   const handleSubmit = async (e) => {
+    // Prevenir el comportamiento por defecto del formulario
     e.preventDefault();
 
+    // Validar que todos los campos estén llenos
     if (
       !nombre ||
       !apellido ||
@@ -88,6 +104,7 @@ function RegistroINS() {
       return;
     }
 
+    // Validar que las contraseñas coincidan
     if (password !== confirmarPassword) {
       setError(true);
       setErrorMessage("Las contraseñas no coinciden");
@@ -95,17 +112,21 @@ function RegistroINS() {
     }
 
     try {
+      // Enviar la solicitud de registro
       await mutate(user, {
         onSuccess: () => {
+          // Resetear los valores del usuario después del registro exitoso
           resetUser();
           setError(false);
           setErrorMessage("");
+
+          // Mostrar notificación de registro exitoso y navegar a la siguiente página
           displayRegistrationNotification();
         },
         onError: (error) => {
-
           let errorMessage = "Error inesperado. Inténtalo de nuevo.";
 
+          // Manejar errores específicos del servidor
           if (error.response && error.response.data) {
             const serverErrorMessage = error.response.data;
 
@@ -120,11 +141,14 @@ function RegistroINS() {
             }
           }
 
+          // Mostrar mensaje de error
           setErrorMessage(errorMessage);
           setError(true);
         },
       });
     } catch (error) {
+      // Manejar errores de manera general
+      console.error("Error en la solicitud:", error);
     }
   };
 

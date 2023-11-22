@@ -7,13 +7,24 @@ export function Cursos() {
   const [isImageVisible, setImageVisible] = useState(true);
   const [currentCard, setCurrentCard] = useState(null);
 
+  // Función para manejar el clic en una tarjeta y comenzar la reproducción del vídeo
   const handleClick = (card) => {
+    // Establecer la tarjeta actual
     setCurrentCard(card);
+
+    // Obtener el elemento <iframe> del documento
     const iframe = document.querySelector("iframe");
+
+    // Configurar un evento para ejecutar cuando el contenido del iframe se haya cargado completamente
     iframe.onload = function () {
+      // Iniciar la reproducción del vídeo dentro del iframe
       iframe.play();
     };
+
+    // Establecer el estado para indicar que el vídeo está reproduciéndose
     setIsVideoPlaying(true);
+
+    // Establecer el estado para ocultar la imagen (asumiendo que hay una imagen que se está ocultando)
     setImageVisible(false);
   };
 

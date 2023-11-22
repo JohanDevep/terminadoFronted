@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCursoMutation } from "../../services/Services";
 import { ToastContainer, toast } from "react-toastify";
 
-function index() {
+function Index() {
   const [error, setError] = useState(false);
   const [curso, setCurso] = useState({
     categoria: "",
@@ -66,55 +66,79 @@ function index() {
   const onInputChange = (e) => {
     setCurso({ ...curso, [e.target.name]: e.target.value });
   };
+
   const displayRegistrationNotification = () => {
-    toast.success("Exitoso");
+    toast.success("Registro exitoso");
     // Redirige a la página deseada después del tiempo de espera
     setTimeout(() => {
       navigate("/");
-    }, 1250); // Redirige a /login después de 3 segundos
+    }, 1250); // Redirige a / después de 1.25 segundos
   };
 
+  // Función para manejar el cambio de un archivo de imagen
+  const handleFileChange = (event) => {
+    // Obtener el archivo seleccionado
+    const file = event.target.files[0];
+
+    // Crear un lector de archivos
+    const reader = new FileReader();
+
+    // Configurar un evento para ejecutar cuando la lectura del archivo esté completa
+    reader.onload = (event) => {
+      // Obtener la representación en base64 de la imagen
+      const encodedData = event.target.result;
+
+      // Actualizar el estado del componente con la nueva imagen
+      setCurso({ ...curso, images: encodedData });
+    };
+
+    // Leer el contenido del archivo como una URL de datos (data URL)
+    reader.readAsDataURL(file);
+  };
+
+  // Función para manejar el envío del formulario al registrar un curso
   const handleSubmit = async (e) => {
+    // Prevenir el comportamiento por defecto del formulario
     e.preventDefault();
+
+    // Validación de campos obligatorios
     if (!titulo || !description || !categoria || !video || !video1) {
+      // Establecer un estado de error si algún campo obligatorio está ausente
       setError(true);
       return;
     }
-    curso.images = encodedImage;
 
-    await mutate(curso, {
-      onSuccess: () => {
-        resetCurso();
-        setError(false);
-        displayRegistrationNotification();
-      },
-      onError: (error) => {
-        if (error.response) {
-          toast.error(`${error.response.data}`);
-        }
-      },
-    });
+    try {
+      // Realizar la mutación para registrar el curso
+      await mutate(curso, {
+        onSuccess: () => {
+          // Resetear el estado del curso y eliminar el error en caso de éxito
+          resetCurso();
+          setError(false);
+
+          // Mostrar notificación de registro exitoso
+          displayRegistrationNotification();
+        },
+        onError: (error) => {
+          // Manejar errores en la solicitud, mostrando mensajes de error al usuario
+          if (error.response) {
+            toast.error(`${error.response.data}`);
+          }
+        },
+      });
+    } catch (error) {
+      // Manejar errores generales que no están relacionados con la solicitud
+      console.error("Error en la solicitud:", error);
+      // Puedes agregar un mensaje de error adicional o realizar acciones específicas en caso de error general
+    }
   };
 
+  // Opciones para la categoría del curso
   const options = [
     { value: "Basico" },
     { value: "Intermedio" },
     { value: "Avanzados" },
   ];
-
-  const [encodedImage, setEncodedImage] = useState("");
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const encodedData = event.target.result;
-      setEncodedImage(encodedData);
-    };
-
-    reader.readAsDataURL(file);
-  };
 
   return (
     <>
